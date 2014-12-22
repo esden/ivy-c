@@ -12,6 +12,15 @@
  *	Please refer to file version.h for the
  *	copyright notice regarding this software
  */
+
+#if defined(__clang__)
+#define COMPILER_HAS_FORMAT_SECURITY 1
+#else
+#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#define COMPILER_HAS_FORMAT_SECURITY 1
+#endif
+#endif
+
 #define DEFAULT_IVYPROBE_NAME "IVYPROBE"
 #define DEFAULT_READY " Ready"
 #include "version.h"
@@ -172,12 +181,13 @@ void HandleStdin (Channel channel, IVY_HANDLE fd, void *data)
 		    } else {
 			  IvyBindingFree( binding );
 
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
 #endif
 			  IvyBindMsg (Callback, NULL, arg);
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_NEW_ENOUGH)
 #pragma GCC diagnostic pop
 #endif
 		    }
@@ -243,12 +253,12 @@ void HandleStdin (Channel channel, IVY_HANDLE fd, void *data)
 		}
 	} else {
 		cmd = strtok (buf, "\n");
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
 #endif
 		err = IvySendMsg (cmd);
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic pop
 #endif
 		printf("-> Sent to %d peer%s\n", err, err == 1 ? "" : "s");
@@ -355,12 +365,12 @@ void BindMsgOfFile( const char * regex_file )
 		if ( size > 1 )
 			{
 			line[size-1] = '\0'; /* supress \n */
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
 #endif
 			IvyBindMsg (Callback, NULL, line);
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic pop
 #endif
 			}
@@ -455,12 +465,12 @@ int main(int argc, char *argv[])
 	for  (; optind < argc; optind++)
 	{
 		printf("Binding to '%s'\n", argv[optind] );
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
 #endif
 		IvyBindMsg (Callback, NULL, argv[optind]);
-#if defined(__GNUC__) && __GNUC_PREREQ(4,7)
+#if defined(COMPILER_HAS_FORMAT_SECURITY)
 #pragma GCC diagnostic pop
 #endif
 	}
