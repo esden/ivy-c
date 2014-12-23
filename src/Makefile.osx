@@ -169,8 +169,7 @@ install: installlibs installbins includes installpkgconf
 # ------------------------------------------------------------------------------------------
 
 clean:
-	-rm -f  *.o *.a *.dylib *.dylib.* *~
-	-rm -f ivy-glib.pc
+	-rm -f  *.o *.a *.dylib *.dylib.* *~ *.pc
 	@(cd $(TOOLS_DIR) && $(MAKE) -f Makefile.osx clean)
 
 # ------------------------------------------------------------------------------------------
@@ -182,5 +181,4 @@ pkgconf:
 
 installpkgconf: pkgconf
 	test -d $(DESTDIR)$(PREFIX)/lib/pkgconfig || mkdir -p $(DESTDIR)$(PREFIX)/lib/pkgconfig
-	install -m 644 ivy.pc							$(DESTDIR)$(PREFIX)/lib/pkgconfig
-	install -m 644 ivy-glib.pc						$(DESTDIR)$(PREFIX)/lib/pkgconfig
+	install -m 644 *.pc	$(DESTDIR)$(PREFIX)/lib/pkgconfig

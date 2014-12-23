@@ -241,8 +241,7 @@ libtclivy.so.$(MAJOR).$(MINOR): $(TCLOBJ)
 
 distclean: clean
 clean:
-	-rm -f $(TARGETS) $(TARGETLIBS)  *.o *.a *.so *.so.* *~
-	-rm -f ivy-glib.pc
+	-rm -f $(TARGETS) $(TARGETLIBS)  *.o *.a *.so *.so.* *~ *.pc
 	@(cd $(TOOLS_DIR) && $(MAKE) clean)
 
 
@@ -338,5 +337,4 @@ pkgconf:
 
 installpkgconf: pkgconf
 	test -d $(DESTDIR)$(PREFIX)/lib/pkgconfig || mkdir -p $(DESTDIR)$(PREFIX)/lib/pkgconfig
-	install -m 644 ivy-glib.pc						$(DESTDIR)$(PREFIX)/lib/pkgconfig
-	install -m 644 ivy.pc							$(DESTDIR)$(PREFIX)/lib/pkgconfig
+	install -m 644 *.pc						$(DESTDIR)$(PREFIX)/lib/pkgconfig
