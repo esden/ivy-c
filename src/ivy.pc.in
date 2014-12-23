@@ -1,9 +1,10 @@
-prefix=PREFIX
+prefix=@DESTDIR@/@PREFIX@
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${exec_prefix}/include
+
 Name: ivy-c
 Description: Ivy software bus.
-Version:3.14
-Libs: -L${libdir} -livy
-Cflags: -I${includedir}
+Version: @MAJOR@.@MINOR@
+Libs: -L${libdir} -livy @PCREINC@
+Cflags: -I${includedir} @REGEXP@ @PCRELIB@ @EXTRALIB@
