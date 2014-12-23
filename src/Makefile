@@ -17,7 +17,7 @@
 
 # change this in version.h too !!!!
 MAJOR=3
-MINOR=14
+MINOR=15
 
 PERHAPS64 := $(shell getconf LONG_BIT | perl -ne "print /64/ ? '64' : '';")
 LIB = /lib$(PERHAPS64)
