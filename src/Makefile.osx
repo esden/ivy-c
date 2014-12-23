@@ -19,6 +19,8 @@
 MAJOR=3
 MINOR=15
 
+LIB=/lib
+
 LBITS := $(shell getconf LONG_BIT)
 ifeq ($(LBITS),64)
   FPIC = -fPIC   
