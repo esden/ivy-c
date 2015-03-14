@@ -28,6 +28,8 @@ ifndef PREFIX
 	PREFIX=/opt/local
 endif
 
+TCLINC = -I/Library/Frameworks/Tcl.framework/Headers
+TCLLIB = -framework Tcl
 PCREINC = $(shell pcre-config --cflags)
 PCRELIB = $(shell pcre-config --libs)
 CASESENSITIVE = "yes"
@@ -43,8 +45,13 @@ REGEXP= -DUSE_PCRE_REGEX -DPCRE_OPT=$(PCRE_OPT)
 OBJ = ivyloop.o timer.o ivysocket.o ivy.o ivybuffer.o ivyfifo.o ivybind.o intervalRegexp.o param.o
 OMPOBJ = ivyloop.o timer.o ivysocket_omp.o ivy_omp.o ivybuffer.o ivyfifo.o ivybind.o intervalRegexp.o param.o
 GLIBOBJ = ivyglibloop.o ivysocket.o ivy.o ivybuffer.o ivyfifo.o ivybind.o intervalRegexp.o param.o
+TCLOBJ = ivytcl.o  timer.o ivysocket.o ivy.o ivybuffer.o ivyfifo.o ivybind.o intervalRegexp.o param.o
 
 TOOLS_DIR = ../tools
+
+# on activeTCL , set #define CHANNEL to null, and add ivyloop.o in the ivytcl target,
+# see below
+CHANNEL = -DTCL_CHANNEL_INTEGRATION
 
 # you should first install gcc version >= 4.3
 # gcc (g++) 4.3 is the first gcc version which support openmp under macosx
@@ -84,12 +91,15 @@ libomp: libivy_omp.a
 omp: libomp
 	@(cd $(TOOLS_DIR) && $(MAKE) -f Makefile.osx omp)
 
-static-libs: libivy.a libglibivy.a
+static-libs: libivy.a libglibivy.a libtclivy.a
 
-shared-libs: libivy.dylib libglibivy.dylib
+shared-libs: libivy.dylib libglibivy.dylib libtclivy.dylib
 
 ivybind.o: ivybind.c
 	$(CC) -c $(CFLAGS) $(REGEXP) $(PCREINC) ivybind.c
+
+ivytcl.o: ivytcl.c
+	$(CC) -c $(CFLAGS) $(TCLINCL) $(CHANNEL) ivytcl.c
 
 ivy_omp.o: ivy.c
 	$(OMPCC) -c $(OMPCFLAGS)  -o ivy_omp.o ivy.c
@@ -124,7 +134,12 @@ libglibivy.dylib: $(GLIBOBJ)
 	$(CC) $(CFLAGS)  -dynamiclib -install_name $(DESTDIR)$(PREFIX)/lib/libglibivy.dylib  -o $@ $(GLIBOBJ) $(PCRELIB) $(GLIBLIB)
 	#$(CC) $(CFLAGS)  -dynamiclib -o $@ $(GLIBOBJ) $(PCRELIB) $(GLIBLIB)
 
+libtclivy.a: $(TCLOBJ)
+	rm -f $@
+	$(LIBTOOL) $@ $(TCLOBJ)
 
+libtclivy.dylib: $(TCLOBJ)
+	$(CC) $(CFLAGS)  -dynamiclib -install_name $(DESTDIR)$(PREFIX)/lib/libtclivy.dylib  -o $@ $(TCLOBJ) $(TCLLIB) $(PCRELIB) $(GLIBLIB)
 
 # ------------------------------------------------------------------------------------------
 
@@ -136,6 +151,8 @@ installlibs: static-libs shared-libs
 	install -m644 libivy.dylib	$(DESTDIR)$(PREFIX)/lib/
 	install -m644 libglibivy.a	$(DESTDIR)$(PREFIX)/lib/
 	install -m644 libglibivy.dylib	$(DESTDIR)$(PREFIX)/lib/
+	install -m644 libtclivy.a	$(DESTDIR)$(PREFIX)/lib/
+	install -m644 libtclivy.dylib	$(DESTDIR)$(PREFIX)/lib/
 
 includes:
 	test -d $(DESTDIR)$(PREFIX)/include/Ivy || mkdir -p $(DESTDIR)$(PREFIX)/include/Ivy
@@ -150,6 +167,7 @@ includes:
 	install -m644 timer.h		$(DESTDIR)$(PREFIX)/include/Ivy/
 	install -m644 version.h		$(DESTDIR)$(PREFIX)/include/Ivy/
 	install -m644 ivyglibloop.h	$(DESTDIR)$(PREFIX)/include/Ivy/
+	install -m644 ivytcl.h		$(DESTDIR)$(PREFIX)/include/Ivy/
 
 installbins: tools
 	test -d $(DESTDIR)$(PREFIX)/bin || mkdir -p $(DESTDIR)$(PREFIX)/bin
